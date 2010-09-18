@@ -4,7 +4,7 @@ class IRCLogger
 	attr_reader :writable, :readable
 	
 	def initialize(fileName)
-		@logFile = File.open(fileName,"w+")
+		@logFile = File.new(fileName,"w+")
 		@loc = fileName
 		@writable = true
 		@readable = true
@@ -42,23 +42,11 @@ class IRCLogger
 		write text if @writable
 	end
 	
-	def write(text)
+	def log(text)
 		@logFile.write text if @writable
 	end
 	
 	def read
 		@logFile.read if @readable
-	end
-	
-	def logA(text)
-		openA
-		write text
-		close
-	end
-	
-	def logW(text)
-		openW
-		write text
-		close
 	end
 end

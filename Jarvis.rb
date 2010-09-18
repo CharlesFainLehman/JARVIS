@@ -15,7 +15,6 @@ class Jarvis
 	def initialize(hostname,rooms, auth, nick, port=6667)
 		@int = IRCInterface.new hostname,port
 		@logger = IRCLogger.new("log\\log-#{timeStamp}.txt")
-		@logger.close
 		@rooms = rooms
 		@auth = auth
 		@nick = nick
@@ -23,7 +22,7 @@ class Jarvis
 	end
 	
 	def shutDown
-		@logger.close if !(@logger.closed?)
+		@logger.close# if !(@logger.closed?)
 		@int.disconnect
 		exit
 	end
@@ -46,7 +45,7 @@ class Jarvis
 		mes = $1 if /PRIVMSG #[\w|\W]* :([\w|\W]*)/ =~ message.strip
 		puts message  #always print the message
 		@int.tell "PONG #{$1}" if /^PING\s(.*)/ =~ message.strip #if I get a ping, I need to tell a pong back with the appropriate number.
-		@logger << mes
+		@logger.log mes + " " if !mes.nil?
 		
 		#talking to me#
 		if !name.nil? and auth name then
@@ -64,6 +63,7 @@ class Jarvis
 	
 	def main
 		trap("INT") do shutDown end
+		trap("TERM") do shutDown end
 	
 		@int.tell "USER #{@nick} #{@nick} #{@nick} #{@nick}"
 		@int.tell "NICK #{@nick}"
@@ -77,5 +77,5 @@ class Jarvis
    
 end
 
-jarvis = Jarvis.new "irc.esper.net",["#dbot"],["Faxanavia"],"JARVIS"
+jarvis = Jarvis.new "hostname",["#channel"],["your_username"],"JARVIS_username"
 jarvis.main
