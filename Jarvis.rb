@@ -1,10 +1,8 @@
-require 'socket'
+require "IRCInterface.rb"
 
 class Jarvis
 
-	@hostname
-	@port
-	@serv
+	@int
 	@rooms
 	@auth
 	@nick
@@ -12,45 +10,15 @@ class Jarvis
 	@parseChan
 
 	def initialize(hostname,rooms, auth, nick, port=6667)
-		@hostname = hostname
-		@port = port
+		@int = IRCInterface.new hostname,port
 		@rooms = rooms
 		@auth = auth
 		@nick = nick
 		@parseChan = true
 	end
 	
-	def connect
-		@serv = TCPSocket.open(@hostname, @port)
-		tell "USER #{@nick} #{@nick} #{@nick} #{@nick}"
-		tell "NICK #{@nick}"
-		@connected = true
-	end
-	
 	def joinAll
-		for chan in @rooms do join(chan) end
-	end
-	
-	def getPing
-		cur = @serv.gets
-		while !(/^PING\s(.*)/ =~ cur); cur = @serv.gets	end
-		tell "PONG #{$1}" if /^PING\s(.*)/ =~ cur
-	end
-	
-	def tell(message)
-		@serv.send message + "\r\n", 0
-	end
-
-	def join(chan)
-		tell("JOIN #{chan}")
-	end
-	
-	def part(chan)
-		tell("PART #{chan}")
-	end
-	
-	def say(message,room)
-		/\/me ([\W|\w]*)/ =~ message ? tell("PRIVMSG #{room} :ACTION #{$1}") : tell("PRIVMSG #{room} :#{message.to_s}") unless message.nil?
+		for chan in @rooms do @int.join(chan) end
 	end
 	
 	def auth(name)
@@ -62,14 +30,14 @@ class Jarvis
 		name = $1 if /:([\w|\W]*)![\w|\W]*@/ =~ message.strip
 		mes = $1 if /PRIVMSG #[\w|\W]* :([\w|\W]*)/ =~ message.strip
 		puts message  #always print the message
-		tell "PONG #{$1}" if /^PING\s(.*)/ =~ message.strip #if I get a ping, I need to tell a pong back with the appropriate number.
+		@int.tell "PONG #{$1}" if /^PING\s(.*)/ =~ message.strip #if I get a ping, I need to tell a pong back with the appropriate number.
 		
 		#talking to me#
 		if !name.nil? and auth name then
 			tell "QUIT" and exit if message.strip.match(/PRIVMSG #{@nick} :!quit/)
-			join($1) if message.strip.match(/PRIVMSG #{@nick} :!join ([\s|\S]*)/)
-			tell($1) if message.strip.match(/PRIVMSG #{@nick} :!tell ([\s|\S]*)/)
-			part($1) if message.strip.match(/PRIVMSG #{@nick} :!part ([\s|\S]*)/)
+			@int.join($1) if message.strip.match(/PRIVMSG #{@nick} :!join ([\s|\S]*)/)
+			@int.tell($1) if message.strip.match(/PRIVMSG #{@nick} :!tell ([\s|\S]*)/)
+			@int.part($1) if message.strip.match(/PRIVMSG #{@nick} :!part ([\s|\S]*)/)
 			@nick = $1 and tell "NICK #{$1}" if message.strip.match(/PRIVMSG #{@nick} :!nick ([\s|\S]*)/)
 			say($2,$1) if message.strip.match(/PRIVMSG #{@nick} :!say (#\S*) ([\s|\S]*)/)
 			@parseChan = false if /PRIVMSG #{@nick} :!parse off/ =~ message.strip
@@ -79,16 +47,17 @@ class Jarvis
 	end
 	
 	def main
-		connect
-		getPing #needs to listen for first ping
+		@int.tell "USER #{@nick} #{@nick} #{@nick} #{@nick}"
+		@int.tell "NICK #{@nick}"
+		@int.ping
 		joinAll
 		loop do
-			toval = @serv.gets
+			toval = @int.gets
 			parse toval
 		end
    end
    
 end
 
-jarvis = Jarvis.new "<HOSTNAME>",["<A ROOM>"],["<YOUR USER NAME>"],"<BOT NAME>"
+jarvis = Jarvis.new "hostname",["#channel"],["your_username"],"JARVIS's_username"
 jarvis.main
