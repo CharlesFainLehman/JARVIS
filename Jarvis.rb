@@ -83,12 +83,12 @@ class Jarvis
 		getPing #needs to listen for first ping
 		joinAll
 		loop do
-			toval = @serv.gets #this is the bit that parses incoming text. Seems to work okay...
+			toval = @serv.gets
 			parse toval
 		end
    end
    
 end
 
-jarvis = Jarvis.new "irc.esper.net",["#dixie"],"Faxanavia","JARVIS"
+jarvis = Jarvis.new "<HOSTNAME>",["<A ROOM>"],["<YOUR USER NAME>"],"<BOT NAME>"
 jarvis.main
