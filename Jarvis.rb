@@ -1,8 +1,11 @@
 require "bin\\IRCInterface.rb"
+require "bin\\IRCLogger.rb"
+require "Time"
 
 class Jarvis
 
 	@int
+	@logger
 	@rooms
 	@auth
 	@nick
@@ -11,10 +14,22 @@ class Jarvis
 
 	def initialize(hostname,rooms, auth, nick, port=6667)
 		@int = IRCInterface.new hostname,port
+		@logger = IRCLogger.new("log\\log-#{timeStamp}.txt")
+		@logger.close
 		@rooms = rooms
 		@auth = auth
 		@nick = nick
 		@parseChan = true
+	end
+	
+	def shutDown
+		@logger.close
+		@int.disconnect
+		exit
+	end
+	
+	def timeStamp
+		Time.now.strftime("%a-%b-%d-%H-%M-%S")
 	end
 	
 	def joinAll
@@ -31,6 +46,7 @@ class Jarvis
 		mes = $1 if /PRIVMSG #[\w|\W]* :([\w|\W]*)/ =~ message.strip
 		puts message  #always print the message
 		@int.tell "PONG #{$1}" if /^PING\s(.*)/ =~ message.strip #if I get a ping, I need to tell a pong back with the appropriate number.
+		@logger.logA mes
 		
 		#talking to me#
 		if !name.nil? and auth name then
@@ -47,6 +63,8 @@ class Jarvis
 	end
 	
 	def main
+		trap("INT") do shutDown end
+	
 		@int.tell "USER #{@nick} #{@nick} #{@nick} #{@nick}"
 		@int.tell "NICK #{@nick}"
 		@int.ping
