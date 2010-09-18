@@ -23,7 +23,7 @@ class Jarvis
 	end
 	
 	def shutDown
-		@logger.close
+		@logger.close if !(@logger.closed?)
 		@int.disconnect
 		exit
 	end
@@ -46,7 +46,7 @@ class Jarvis
 		mes = $1 if /PRIVMSG #[\w|\W]* :([\w|\W]*)/ =~ message.strip
 		puts message  #always print the message
 		@int.tell "PONG #{$1}" if /^PING\s(.*)/ =~ message.strip #if I get a ping, I need to tell a pong back with the appropriate number.
-		@logger.logA mes
+		@logger << mes
 		
 		#talking to me#
 		if !name.nil? and auth name then

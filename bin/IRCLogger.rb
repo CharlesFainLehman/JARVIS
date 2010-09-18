@@ -4,7 +4,7 @@ class IRCLogger
 	attr_reader :writable, :readable
 	
 	def initialize(fileName)
-		@logFile = File.new(fileName,"w+")
+		@logFile = File.open(fileName,"w+")
 		@loc = fileName
 		@writable = true
 		@readable = true
@@ -32,6 +32,10 @@ class IRCLogger
 		@logFile.close
 		@writable = false
 		@readable = false
+	end
+	
+	def closed?
+		@logFile.closed?
 	end
 	
 	def <<(text)
