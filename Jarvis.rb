@@ -15,7 +15,10 @@ class Jarvis
 	def initialize(hostname,rooms, auth, nick, port=6667)
 		@int = IRCInterface.new hostname,port
 		@logger = IRCLogger.new("log\\log-#{timeStamp}.txt")
-		@rooms = rooms
+		@rooms = []
+		for room in rooms do
+			room =~ /#.*/ ? @rooms << room : @rooms << "#" + room
+		end
 		@auth = auth
 		@nick = nick
 		@parseChan = true
@@ -76,6 +79,3 @@ class Jarvis
    end
    
 end
-
-jarvis = Jarvis.new "hostname",["#channel"],["your_username"],"JARVIS_username"
-jarvis.main

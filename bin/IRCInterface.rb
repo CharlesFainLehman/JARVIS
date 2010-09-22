@@ -11,7 +11,15 @@ class IRCInterface
 	end
 	
 	def connect(hostname, port)
-		@serv = TCPSocket.open(hostname, port)
+		begin
+			@serv = TCPSocket.open(hostname, port)
+		rescue SocketError => e
+			puts "could not open connection to host #{hostname} on port #{port}"
+			connect("127.0.0.1",6667)
+		rescue Errno::ETIMEDOUT => e
+			puts "The connection was opened, but failed to respond. Ensure you've opened a connection to the proper server."
+			exit
+		end
 	end
 	
 	def disconnect
