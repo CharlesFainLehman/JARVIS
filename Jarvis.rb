@@ -6,18 +6,18 @@ class Jarvis
 
 	@int
 	@logger
-	@rooms
+	@chans
 	@auth
 	@nick
 	@connected
 	@parseChan
 
-	def initialize(hostname,rooms, auth, nick, port=6667)
+	def initialize(hostname,chans, auth, nick, port=6667)
 		@int = IRCInterface.new hostname,port
 		@logger = IRCLogger.new("log\\log-#{timeStamp}.txt")
-		@rooms = []
-		for room in rooms do
-			room =~ /#.*/ ? @rooms << room : @rooms << "#" + room
+		@chans = []
+		for chan in chans do
+			chan =~ /#.*/ ? @chans << chan : @chans << "#" + chan
 		end
 		@auth = auth
 		@nick = nick
@@ -25,7 +25,7 @@ class Jarvis
 	end
 	
 	def shutDown
-		@logger.close# if !(@logger.closed?)
+		@logger.close
 		@int.disconnect
 		exit
 	end
@@ -35,13 +35,37 @@ class Jarvis
 	end
 	
 	def joinAll
-		for chan in @rooms do @int.join(chan) end
+		for chan in @chans do join chan end
 	end
+
+############################################################
 	
 	def auth(name)
 		@auth.include? name
 	end
+
+############################################################
 	
+	def join(chan)
+		if chan =~ /#.*/ then
+			@int.join chan
+			@chans << chan
+		else
+			@int.join "#" + chan
+			@chans << "#" + chan
+		end
+	end
+	
+	def part(chan)
+		@int.part chan
+		@chans.delete_if {|c| c == chan}
+	end
+	
+	def say(message, chan)
+		@int.say message, chan
+	end
+	
+############################################################
 	def parse(message)
 		chan = $1 if /PRIVMSG (#\S*)/ =~ message.strip
 		name = $1 if /:([\w|\W]*)![\w|\W]*@/ =~ message.strip

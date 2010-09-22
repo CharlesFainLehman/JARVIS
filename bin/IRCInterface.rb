@@ -48,8 +48,8 @@ class IRCInterface
 		tell("PART #{chan}")
 	end
 	
-	def say(message,room)
-		/\/me ([\W|\w]*)/ =~ message ? tell("PRIVMSG #{room} :ACTION #{$1}") : tell("PRIVMSG #{room} :#{message.to_s}") unless message.nil?
+	def say(message,chan)
+		/\/me ([\W|\w]*)/ =~ message ? tell("PRIVMSG #{chan} :ACTION #{$1}") : tell("PRIVMSG #{chan} :#{message.to_s}") unless message.nil?
 	end
 	
 	def gets
