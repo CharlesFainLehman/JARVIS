@@ -41,7 +41,7 @@ class Jarvis
 	end
 	
 	def joinAll
-		for chan in @chans do @int.join chan end
+		for chan in @chans.clone do join chan end
 	end
 
 ############################################################
@@ -54,11 +54,12 @@ class Jarvis
 	
 	#doesn't work for some reason...
 	def join(chan)
+		puts chan
 		if chan =~ /#.*/ then
-			@int.join chan
+			@int.join(chan)
 			@chans << chan
 		else
-			@int.join "#" + chan
+			@int.join("#" + chan)
 			@chans << "#" + chan
 		end
 	end
