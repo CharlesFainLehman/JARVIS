@@ -54,7 +54,6 @@ class Jarvis
 	
 	#doesn't work for some reason...
 	def join(chan)
-		puts chan
 		if chan =~ /#.*/ then
 			@int.join(chan)
 			@chans << chan
