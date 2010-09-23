@@ -4,7 +4,7 @@ begin
 	require "yaml"
 	
 	config = YAML.load_file("config.yaml")
-	jarvis = Jarvis.new config['hostname'], config['chan'], config['auth'], config['username'], config['port']
+	jarvis = Jarvis.new config['hostname'], config['chans'], config['auth'], config['username'], config['port']
 	jarvis.main
 
 rescue LoadError => e

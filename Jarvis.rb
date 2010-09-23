@@ -13,7 +13,6 @@ class Jarvis
 	@parseChan
 
 	def initialize(hostname,chans, auth, nick, port=6667)
-		@int = IRCInterface.new hostname,port
 		@logger = IRCLogger.new("log\\log-#{timeStamp}.txt")
 		@chans = []
 		for chan in chans do
@@ -22,6 +21,13 @@ class Jarvis
 		@auth = auth
 		@nick = nick
 		@parseChan = true
+		@int = IRCInterface.new hostname,port
+	end
+	
+	def setup #setup for afer connection
+		@int.tell "USER #{@nick} #{@nick} #{@nick} #{@nick}"
+		@int.tell "NICK #{@nick}"
+		@int.ping
 	end
 	
 	def shutDown
@@ -35,7 +41,7 @@ class Jarvis
 	end
 	
 	def joinAll
-		for chan in @chans do join chan end
+		for chan in @chans do @int.join chan end
 	end
 
 ############################################################
@@ -46,6 +52,7 @@ class Jarvis
 
 ############################################################
 	
+	#doesn't work for some reason...
 	def join(chan)
 		if chan =~ /#.*/ then
 			@int.join chan
@@ -92,10 +99,9 @@ class Jarvis
 		trap("INT") do shutDown end
 		trap("TERM") do shutDown end
 	
-		@int.tell "USER #{@nick} #{@nick} #{@nick} #{@nick}"
-		@int.tell "NICK #{@nick}"
-		@int.ping
+		setup
 		joinAll
+	
 		loop do
 			toval = @int.gets
 			parse toval
