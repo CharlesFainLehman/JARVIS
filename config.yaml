@@ -2,3 +2,4 @@ hostname: hostname.goes.here
 chans: [chan_1, chan_2] #don't use pound signs - yaml is whiny
 auth: [authorized_user_1, authorized_user_2]
 username: JARVIS
+port: 6667
