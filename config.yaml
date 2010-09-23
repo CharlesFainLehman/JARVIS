@@ -1,5 +1,5 @@
-hostname: irc.esper.net
-chans: [dixie] #don't use pound signs - yaml is whiny
-auth: [Faxanavia]
+hostname: hostname.goes.here
+chans: [chan] #don't use pound signs - yaml is whiny
+auth: [your_username]
 username: JARVIS
 port: 6667
