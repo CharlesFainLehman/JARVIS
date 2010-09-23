@@ -14,10 +14,13 @@ class IRCInterface
 		begin
 			@serv = TCPSocket.open(hostname, port)
 		rescue SocketError => e
-			puts "could not open connection to host #{hostname} on port #{port}"
+			puts "Could not open connection to host #{hostname} on port #{port}"
 			connect("127.0.0.1",6667)
 		rescue Errno::ETIMEDOUT => e
 			puts "The connection was opened, but failed to respond. Ensure you've opened a connection to the proper server."
+			exit
+		rescue Errno::EPERM => e
+			puts "Could not bind socket. Ensure that the port you wish to connect to is open."
 			exit
 		end
 	end
