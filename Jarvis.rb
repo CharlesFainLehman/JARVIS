@@ -72,6 +72,10 @@ class Jarvis
 		@int.say message, chan
 	end
 	
+	def gets
+		@int.gets
+	end
+	
 ############################################################
 	def parse(message)
 		chan = $1 if /PRIVMSG (#\S*)/ =~ message.strip
