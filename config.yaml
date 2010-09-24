@@ -1,5 +1,5 @@
-hostname: hostname.goes.here
-chans: [channel_1] #don't use pound signs - yaml is whiny
-auth: [approved_user]
-username: JARVIS
+hostname: irc.esper.net
+chans: [Winchester] #don't use pound signs - yaml is whiny
+auth: [Faxanavia]
+username: RedstoneBot
 port: 6667

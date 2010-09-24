@@ -76,7 +76,6 @@ class Jarvis
 		chan = $1 if /PRIVMSG (#\S*)/ =~ message.strip
 		name = $1 if /:([\w|\W]*)![\w|\W]*@/ =~ message.strip
 		mes = $1 if /PRIVMSG #[\w|\W]* :([\w|\W]*)/ =~ message.strip
-		puts message  #always print the message
 		@int.tell "PONG #{$1}" if /^PING\s(.*)/ =~ message.strip #if I get a ping, I need to tell a pong back with the appropriate number.
 		@logger.log mes + " " if !mes.nil?
 		
@@ -103,6 +102,7 @@ class Jarvis
 	
 		loop do
 			toval = @int.gets
+			puts toval
 			parse toval
 		end
    end
