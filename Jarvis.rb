@@ -4,13 +4,8 @@ require "Time"
 
 class Jarvis
 
-	@int
-	@logger
-	@chans
-	@auth
-	@nick
-	@connected
-	@parseChan
+	attr_reader :int, :logger, :auth, :parseChan
+	attr_accessor :chans, :nick, :connected
 
 	def initialize(hostname,chans, auth, nick, port=6667)
 		@logger = IRCLogger.new("log\\log-#{timeStamp}.txt")
