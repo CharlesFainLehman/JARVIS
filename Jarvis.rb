@@ -1,5 +1,5 @@
-require "bin\\IRCInterface.rb"
-require "bin\\IRCLogger.rb"
+require "bin/IRCInterface.rb"
+require "bin/IRCLogger.rb"
 require "Time"
 
 class Jarvis
