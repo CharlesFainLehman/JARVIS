@@ -51,10 +51,10 @@ class Jarvis
 	def join(chan)
 		if chan =~ /#.*/ then
 			@int.join(chan)
-			@chans << chan
+			#@chans << chan
 		else
 			@int.join("#" + chan)
-			@chans << "#" + chan
+			#@chans << "#" + chan
 		end
 	end
 	
