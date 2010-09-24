@@ -22,7 +22,7 @@ class Jarvis
 	def setup #setup for afer connection
 		@int.tell "USER #{@nick} #{@nick} #{@nick} #{@nick}"
 		@int.tell "NICK #{@nick}"
-		@int.ping
+		ping
 	end
 	
 	def shutDown
@@ -65,6 +65,10 @@ class Jarvis
 	
 	def say(message, chan)
 		@int.say message, chan
+	end
+	
+	def ping(mes = "")
+		@int.ping mes
 	end
 	
 	def gets

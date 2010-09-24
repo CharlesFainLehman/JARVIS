@@ -31,10 +31,14 @@ class IRCInterface
 	
 #########################################################
 	
-	def ping
-		cur = self.gets
-		while !(/^PING\s(.*)/ =~ cur); puts cur; cur = @serv.gets	end
-		tell "PONG #{$1}" if /^PING\s(.*)/ =~ cur
+	def ping(mes = "")
+		if mes == ""  then
+			cur = self.gets
+			while !(/^PING\s(.*)/ =~ cur); cur = @serv.gets	end
+			tell "PONG #{$1}" if /^PING\s(.*)/ =~ cur
+		else
+			tell "PONG #{$1}" if /^PING\s(.*)/ =~ mes
+		end
 	end
 	
 #########################################################
