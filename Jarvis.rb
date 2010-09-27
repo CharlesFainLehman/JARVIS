@@ -1,6 +1,6 @@
 require "bin/IRCInterface.rb"
 require "bin/IRCLogger.rb"
-require "Time"
+require "time"
 
 class Jarvis
 
@@ -8,7 +8,7 @@ class Jarvis
 	attr_accessor :chans, :nick, :connected
 
 	def initialize(hostname,chans, auth, nick, port=6667)
-		@logger = IRCLogger.new("log\\log-#{timeStamp}.txt")
+		@logger = IRCLogger.new("log/log-#{timeStamp}.txt")
 		@chans = []
 		for chan in chans do
 			chan =~ /#.*/ ? @chans << chan : @chans << "#" + chan
@@ -105,9 +105,11 @@ class Jarvis
 		joinAll
 	
 		loop do
-			toval = @int.gets
-			puts toval
-			parse toval
+			outputs = @int.gets
+			for output in outputs do
+				puts output
+				parse output
+			end
 		end
    end
    

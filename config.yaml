@@ -1,4 +1,4 @@
-hostname: hostname.goes.here
+hostname: irc.esper.net
 chans: [channel] #don't use pound signs - yaml is whiny
 auth: [name]
 username: JARVIS

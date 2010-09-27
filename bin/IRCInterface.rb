@@ -2,11 +2,13 @@ require 'socket'
 
 class IRCInterface
 	attr_accessor :hostname, :port
+	@input
 	attr_reader :serv
 	
 	def initialize(hostname, port)
 		@hostname = hostname
 		@port = port
+		@input = IO.new 0,"w"
 		connect hostname, port
 	end
 	
@@ -33,7 +35,7 @@ class IRCInterface
 	
 	def ping(mes = "")
 		if mes == ""  then
-			cur = self.gets
+			cur = @serv.gets
 			while !(/^PING\s(.*)/ =~ cur); cur = @serv.gets	end
 			tell "PONG #{$1}" if /^PING\s(.*)/ =~ cur
 		else
@@ -60,7 +62,17 @@ class IRCInterface
 	end
 	
 	def gets
-		@serv.gets
+		r,d,d = select([@serv,@input],nil,nil)
+		out = []
+		unless r.nil?
+			r.each do |i|
+				begin
+					out << i.gets
+				rescue IOError
+				end
+			end
+		end
+		out
 	end
 	
 end
