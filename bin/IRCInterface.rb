@@ -75,4 +75,8 @@ class IRCInterface
 		out
 	end
 	
+	def write(w)
+		@input.write w
+	end
+	
 end

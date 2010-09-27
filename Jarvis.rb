@@ -75,6 +75,10 @@ class Jarvis
 		@int.gets
 	end
 	
+	def write(w)
+		@int.write w
+	end
+	
 ############################################################
 	def parse(message)
 		chan = $1 if /PRIVMSG (#\S*)/ =~ message.strip
