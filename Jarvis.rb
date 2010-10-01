@@ -16,6 +16,21 @@ class Jarvis
 		@auth = auth
 		@nick = nick
 		@parseChan = true
+		
+		@cmds = []
+		Dir.foreach("./plugins") {|file|
+			if /([\w|\W]*?).rb/ =~ file then #if it's a ruby file
+                unless file == "plugin.rb" #ignore plugin superclass
+                    begin
+                        require "plugins/" + file
+                        @cmds << Kernel.const_get(file.gsub(/.rb$/, '')).new(self)
+                    rescue NameError => e
+                        puts "#{file} failed to load into a class. Name of class must be constant!"
+                    end
+                end
+			end
+		}
+		
 		@int = IRCInterface.new hostname,port
 	end
 	
@@ -75,6 +90,10 @@ class Jarvis
 		@int.gets
 	end
 	
+	def getApproval(name)
+		1
+	end
+	
 	def write(w)
 		@int.write w
 	end
@@ -84,20 +103,13 @@ class Jarvis
 		chan = $1 if /PRIVMSG (#\S*)/ =~ message.strip
 		name = $1 if /:([\w|\W]*)![\w|\W]*@/ =~ message.strip
 		mes = $1 if /PRIVMSG #[\w|\W]* :([\w|\W]*)/ =~ message.strip
-		@int.tell "PONG #{$1}" if /^PING\s(.*)/ =~ message.strip #if I get a ping, I need to tell a pong back with the appropriate number.
+		@int.tell "PONG #{$1}" if /^PING\s(.*)/ =~ message.strip 
 		@logger.log mes + " " if !mes.nil?
 		
-		#talking to me#
-		if !name.nil? and auth name then
-			@int.tell "QUIT" and exit if message.strip.match(/PRIVMSG #{@nick} :!quit/)
-			@int.join($1) if message.strip.match(/PRIVMSG #{@nick} :!join ([\s|\S]*)/)
-			@int.tell($1) if message.strip.match(/PRIVMSG #{@nick} :!tell ([\s|\S]*)/)
-			@int.part($1) if message.strip.match(/PRIVMSG #{@nick} :!part ([\s|\S]*)/)
-			@nick = $1 and tell "NICK #{$1}" if message.strip.match(/PRIVMSG #{@nick} :!nick ([\s|\S]*)/)
-			@int.say($2,$1) if message.strip.match(/PRIVMSG #{@nick} :!say (#\S*) ([\s|\S]*)/)
-			@parseChan = false if /PRIVMSG #{@nick} :!parse off/ =~ message.strip
-			@parseChan = true if /PRIVMSG #{@nick} :!parse on/ =~ message.strip
-			@auth << $1 if /PRIVMSG #{@nick} :!auth ([\W|\w]*)/ =~ message.strip
+		for cmd in @cmds do
+			if cmd.match?(mes) >= 0 and cmd.approvals.include?(getApproval(name)) then
+				cmd.run(mes,name, cmd.match?(mes), getApproval(name))
+			end
 		end
 	end
 	
